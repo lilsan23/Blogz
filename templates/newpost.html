@@ -1,36 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Build a Blog</h1>
+    <h1>Make a Post</h1>
     <form method='post'>
         <label>
             Title of Blog Post:
-            <input type="text" name='title' />
         </label>
+            <input type="text" name='title' />   <br>
+            <p class="error">{{ title_error }}</p><br>
         <label>
             Blog Comments:
         </label>
-        <input type="text" name='post' />
+        <br>
+            <textarea name='body' rows="10" cols="30">
+            </textarea>
+            <p class="error">{{ post_error }}</p><br>
         <input type="submit" value='Add Post' />
     </form>
 
     <hr />
 
-    {% if blog|length == 0 %}
+    {% if blogs|length == 0 %}
     <p>No posts yet</p>
     {% else %}
 
-        <!-- <ul>
-            {% for post in blog %}
+        <ul>
+            {% for blog in blogs %}
             <li>{{blog.title}}
-                <form method="POST" action="/blog" style="display:inline-block;">
-                    <input type="hidden" name="blog-id" value="{{blog.id}}" />
-                    <input type="submit" value="Done!" />
-                </form>
+                {{blog.body}}
             </li>
             {% endfor %}
-        </ul> -->
-
+        </ul>
+        <hr>
     {% endif %}
 
     <!-- <hr />
