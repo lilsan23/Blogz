@@ -19,8 +19,6 @@ class Blog(db.Model):
         self.title = title
         self.body = body
 
-new_entry =[]
-
 @app.route('/')
 def index():
     blogs = Blog.query.all()
@@ -43,27 +41,26 @@ def new_post():
         if body == "":
             post_error = "Enter data"
 
-        if not title_error or not post_error:
+        if not title_error and not post_error:
             new_post_name = Blog(name, body)
             db.session.add(new_post_name)
             db.session.commit()
-            blogs = Blog.query.all()
-            return render_template('main.html', title="Blog Posts", blogs=blogs)
+            return redirect("/blog?id=" +str(new_post_name.id))
         else:
             return render_template('newpost.html',title="Add a Post", title_error=title_error, 
                 post_error=post_error,
                 name=name,
                 body=body)
 
-   return render_template('newpost.html',title="Add a Post")
+        return render_template('newpost.html',title="Add a Post")
+   return render_template('newpost.html')
 
-#     return redirect('/')
 @app.route('/blog')
 def blog():
+    blog_id = request.args.get('id')
+    blog = Blog.query.filter_by(id=blog_id).first()
+    return render_template('blog.html', blog=blog)
 
-        blog_id = int(request.form['blog-id'])
-        new_entry = Blog.query.get(blog_id)
-        return render_template('blog.html', title="Blog Post", new_entry=new_entry)
 
 if __name__ == '__main__':
     app.run()

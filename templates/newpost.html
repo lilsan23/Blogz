@@ -14,11 +14,12 @@
         <br>
             <textarea name='body' rows="10" cols="30">
             </textarea>
-            <p class="error">{{ post_error }}</p><br>
-        <input type="submit" value='Add Post' />
+            <p class="error">{{ post_error }}</p>
+            <input="hidden" name="blogid" valu="{{id}}" />
+            <input type="submit" value='Add Post' />
     </form>
 
-    <hr />
+    <hr>
 
     {% if blogs|length == 0 %}
     <p>No posts yet</p>
@@ -26,22 +27,15 @@
 
         <ul>
             {% for blog in blogs %}
-            <li>{{blog.title}}
+            <li>
+                <h3>{{blog.title}}</h3>
+                <br>
                 {{blog.body}}
+                <hr>
             </li>
             {% endfor %}
+            <hr> 
         </ul>
-        <hr>
-    {% endif %}
-
-    <!-- <hr />
-
-    <h2>Completed</h2>
-
-    <ul>
-        {% for task in completed_tasks %}
-        <li>{{task.name}}</li>
-        {% endfor %}
-    </ul> -->
+  {% endif %}
 
 {% endblock %}
