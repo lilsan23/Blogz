@@ -1,5 +1,5 @@
 
-from flask import Flask, request, redirect, render_template, flash
+from flask import Flask, request, redirect, render_template, flash, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -32,11 +32,11 @@ class User(db.Model):
         self.username = username
         self.password = password
 
-# @app.before_request
-# def require_login():
-#     allowed_routes = ['login', 'register']
-#     if request.endpoint not in allowed_routes and 'username' not in session:
-#         return redirect('/login')
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'register']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -46,13 +46,13 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
-            # session['username'] = username
+            session['username'] = username
             flash("Logged in")
-            return redirect('/')
+            return redirect('/newpost')
         else:
             flash('User password incorrect, or user does not exist', 'error')
 
-    return render_template('login.html')
+    return render_template('login.html', title="Blogz Login")
 
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -85,8 +85,9 @@ def register():
             new_user = User(username, password)
             db.session.add(new_user)
             db.session.commit()
-            # session['username'] = username
-            return redirect('/')
+            session['username'] = username
+            flash("Logged in")
+            return redirect('/newpost')
         else:
                 # TODO - user better response messaging
             return render_template('register.html', username_error=username_error, 
@@ -96,12 +97,12 @@ def register():
                password=password,
                verify=verify)
 
-    return render_template('register.html')
+    return render_template('register.html', title="Blogz Registration")
 
-# @app.route('/logout')
-# def logout():
-#     del session['username']
-#     return redirect('/')
+@app.route('/logout')
+def logout():
+    del session['username']
+    return redirect('/login')
 
 @app.route('/')
 def index():
@@ -146,7 +147,7 @@ def new_post():
 def blog():
     blog_id = request.args.get('id')
     blog = Blog.query.filter_by(id=blog_id).first()
-    return render_template('blog.html', blog=blog)
+    return render_template('blog.html', title= "Blog", blog=blog)
 
 if __name__ == '__main__':
     app.run()
