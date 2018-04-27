@@ -34,7 +34,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'register']
+    allowed_routes = ['index', 'login', 'register', 'blog', 'blogs', 'myblogs','homepage']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -89,7 +89,7 @@ def register():
             flash("Logged in")
             return redirect('/newpost')
         else:
-                # TODO - user better response messaging
+            
             return render_template('register.html', username_error=username_error, 
                password_error=password_error, 
                verify_error=verify_error,
@@ -102,10 +102,10 @@ def register():
 @app.route('/logout')
 def logout():
     del session['username']
-    return redirect('/login')
+    return redirect('/blogs')
 
-@app.route('/')
-def index():
+@app.route('/blogs')
+def blogs():
     blogs = Blog.query.all()
     return render_template('main.html', title="Blog Posts", blogs=blogs)
   
@@ -113,41 +113,60 @@ def index():
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
 
-#    owner = User.query.filter_by(username=session['username']).first()
+    owner = User.query.filter_by(username=session['username']).first()
 
-   if request.method == 'POST':
-        name = request.form['title']
+    if request.method == 'POST':
+        name = request.form['name']
         body = request.form['body']
-        owner = request.form['owner']
         
-        title_error = ""
+        name_error = ""
         post_error = ""
 
         if name == "":
-            title_error = "Enter title"
+            name_error = "Enter title"
 
         if body == "":
             post_error = "Enter data"
 
-        if not title_error and not post_error:
+        if not name_error and not post_error:
             new_post_name = Blog(name, body, owner)
             db.session.add(new_post_name)
             db.session.commit()
             return redirect("/blog?id=" +str(new_post_name.id))
         else:
-            return render_template('newpost.html',title="Add a Post", title_error=title_error, 
+            return render_template('newpost.html',title="New Post", name_error=name_error, 
                 post_error=post_error,
                 name=name,
                 body=body)
 
-        return render_template('newpost.html',title="Add a Post")
-   return render_template('newpost.html')
+    return render_template('newpost.html')
 
 @app.route('/blog')
 def blog():
     blog_id = request.args.get('id')
     blog = Blog.query.filter_by(id=blog_id).first()
     return render_template('blog.html', title= "Blog", blog=blog)
+
+@app.route('/', methods=['POST', 'GET'])
+def index():
+
+    owner = User.query.filter_by(username=session['username']).first()
+
+    if request.method == 'POST':
+        name = request.form['username']
+        password = request.form['password']
+        new_post_name = Blog(name, password, owner)
+        db.session.add(new_post_name)
+        db.session.commit()
+
+    user = Blog.query.filter_by(username=name).all()
+    return render_template('index.html', title="Blog Posts", blogs=blogs)
+  
+@app.route('/myblogs')
+def myblogs():
+    user = request.args.get('id')
+    userid = Blog.query.filter_by(user=id).first()
+    return render_template('myblogs.html', title= "Blog", blog=blog)
 
 if __name__ == '__main__':
     app.run()

@@ -7,6 +7,7 @@
             Title of Blog Post:
             <input type="text" name='name' />
         </label>
+        <span class="error">{{ name_error }}</span><br>
         <br>
         <br>
         <label>
@@ -14,6 +15,7 @@
         </label>
         <br>
         <textarea name='body' rows='5' cols='50'></textarea>
+        <span class="error">{{ post_error }}</span><br>
         <br>
         <input type="submit" value='Add Post' />
     </form>
