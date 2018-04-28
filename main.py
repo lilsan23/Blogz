@@ -147,9 +147,15 @@ def blog():
     blog = Blog.query.filter_by(id=blog_id).first()
     return render_template('blog.html', title= "Blog", blog=blog)
 
-@app.route('/', methods=['POST', 'GET'])
+@app.route('/')
 def index():
 
+    users = User.query.all()
+    return render_template('index.html', title="Blog Posts", users=users)
+  
+@app.route('/myblogs')
+def myblogs():
+   
     owner = User.query.filter_by(username=session['username']).first()
 
     if request.method == 'POST':
@@ -159,11 +165,6 @@ def index():
         db.session.add(new_post_name)
         db.session.commit()
 
-    user = Blog.query.filter_by(username=name).all()
-    return render_template('index.html', title="Blog Posts", blogs=blogs)
-  
-@app.route('/myblogs')
-def myblogs():
     user = request.args.get('id')
     userid = Blog.query.filter_by(user=id).first()
     return render_template('myblogs.html', title= "Blog", blog=blog)
