@@ -9,11 +9,9 @@
 
         <ul>
             {% for blog in blogs %}
-            <li><h3><a href = "./blog?id={{blog.id}}">{{blog.title}}</h3></a>
+            <li><a href = "./blog?user={{user.id}}">{{blog.title}}</h3></a>
                 <br>
                 {{blog.body}}
-                <br>
-                written by <a href="./blog?user={{blog.owner.id}}">{{blog.owner.username}}</a></p> 
                 <hr>
             </li>
             {% endfor %}

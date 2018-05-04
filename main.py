@@ -34,7 +34,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['index', 'login', 'register', 'blog', 'blogs', 'myblogs','homepage']
+    allowed_routes = ['index', 'login', 'register', 'blog', 'home']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -102,18 +102,10 @@ def register():
 @app.route('/logout')
 def logout():
     del session['username']
-    return redirect('/blogs')
-
-@app.route('/blogs')
-def blogs():
-    blogs = Blog.query.all()
-    return render_template('main.html', title="Blog Posts", blogs=blogs)
-  
+    return redirect('/blog')
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
-
-    owner = User.query.filter_by(username=session['username']).first()
 
     if request.method == 'POST':
         name = request.form['name']
@@ -129,6 +121,7 @@ def new_post():
             post_error = "Enter data"
 
         if not name_error and not post_error:
+            owner = User.query.filter_by(username=session['username']).first()
             new_post_name = Blog(name, body, owner)
             db.session.add(new_post_name)
             db.session.commit()
@@ -143,31 +136,26 @@ def new_post():
 
 @app.route('/blog')
 def blog():
-    blog_id = request.args.get('id')
-    blog = Blog.query.filter_by(id=blog_id).first()
-    return render_template('blog.html', title= "Blog", blog=blog)
+    
+    if request.args.get('id'):
+        blog_id = request.args.get('id')
+        blog = Blog.query.get(blog_id)
+        return render_template('blog.html', title= "Blog", blog=blog)
 
+    elif request.args.get('user'):
+        user_id = request.args.get('user')
+        users = Blog.query.filter_by(owner_id=user_id).all()
+        return render_template('myblogs.html', title="Blogs", users=users)
+
+    blogs = Blog.query.all()
+    return render_template('main.html', title="Blog Posts", blogs=blogs)    
+
+    
 @app.route('/')
 def index():
 
     users = User.query.all()
     return render_template('index.html', title="Blog Posters", users=users)
-  
-@app.route('/myblogs')
-def myblogs():
-   
-    owner = User.query.filter_by(username=session['username']).first()
-
-    if request.method == 'POST':
-        name = request.form['username']
-        password = request.form['password']
-        new_post_name = Blog(name, password, owner)
-        db.session.add(new_post_name)
-        db.session.commit()
-
-    user = request.args.get('id')
-    userid = Blog.query.filter_by(user=id).first()
-    return render_template('myblogs.html', title= "Blog", blog=blog)
 
 if __name__ == '__main__':
     app.run()

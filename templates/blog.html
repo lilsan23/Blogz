@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<h3>{{blog.title}}</h3>
-<br>
-<p>{{blog.body}}</p>
-
+    <h3><a href = "/blog?id={{blog.id}}">{{blog.title}}</h3></a>
+    <br>
+    <p>{{blog.body}}</p>
+    <br>
+    <p class="post-author">written by <a href="/blog?user={{blog.owner.id}}">{{blog.owner.username}}</a></p>
+    <hr>
 {% endblock %}
